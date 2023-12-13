@@ -6,12 +6,18 @@ public class Bomb : MonoBehaviour
 {
     public float maxHeight;     //포물선을 그릴 때 올라갈 최대 높이
     public float flyingDuration;//발사지점에서 목표 지점까지 이동하는데 걸리는 시간
-    public float damage;
+    public int damage;
     private Vector3 startPos;
     private Vector3 targetPos;
     public Transform spriteTransform;
-    public Collider2D colliderObj;
-    
+    public GameObject explosionObj;
+    public GameObject colliderObj;
+
+    private void Start()
+    {
+        colliderObj.GetComponent<BombCollider>().SetDamage(damage);
+    }
+
     public void Throw(Vector3 targetPos)
     {
 
@@ -36,12 +42,14 @@ public class Bomb : MonoBehaviour
 
             if(durationAmount <= 0.5)
             {
-                currentHeight = Mathf.Lerp(0, maxHeight, durationAmount * 2);
+                currentHeight = Mathf.Sin(Mathf.Lerp(0f, 90f,durationAmount * 2) * Mathf.Deg2Rad) * maxHeight;
+                //currentHeight = Mathf.Lerp(0, maxHeight, durationAmount * 2);
                 spriteVector.y = currentHeight;
             }
             else
             {
-                currentHeight = Mathf.Lerp(maxHeight, 0, (durationAmount - 0.5f) * 2);
+                currentHeight = Mathf.Sin(Mathf.Lerp(90f, 180f, (durationAmount - 0.5f) * 2) * Mathf.Deg2Rad) * maxHeight;
+                //currentHeight = Mathf.Lerp(maxHeight, 0, (durationAmount - 0.5f) * 2);
                 spriteVector.y = currentHeight;
             }
 
@@ -51,7 +59,8 @@ public class Bomb : MonoBehaviour
             yield return null;
         }
         spriteTransform.gameObject.SetActive(false);
-        colliderObj.gameObject.SetActive(true);
-        Destroy(gameObject, 1f);
+        explosionObj.SetActive(true);
+        colliderObj.SetActive(true);
+        Destroy(gameObject, 0.5f);
     }
 }

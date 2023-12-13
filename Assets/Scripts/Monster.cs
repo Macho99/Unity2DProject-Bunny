@@ -91,7 +91,7 @@ public class Monster : MonoBehaviour
     {
         if (collision.collider.TryGetComponent<Bullet>(out Bullet bullet))
         {
-            TakeDamage();
+            TakeDamage(1);
         }
         else if (collision.collider.TryGetComponent<Player>(out _))
         {
@@ -108,10 +108,18 @@ public class Monster : MonoBehaviour
         }
     }
 
-    private void TakeDamage()
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(collision.TryGetComponent<BombCollider>(out var bombCollider))
+        {
+            TakeDamage(bombCollider.GetDamage());
+        }
+    }
+
+    private void TakeDamage(int damage)
     {
         animator.SetTrigger("Hit");
-        curHp--;
+        curHp -= damage;
         if(curHp <= 0)
         {
             curHp = 0;
@@ -120,6 +128,7 @@ public class Monster : MonoBehaviour
         }
         SetHpBar();
     }
+
     private void SetHpBar()
     {
         float ratio = (float)curHp / (float)maxHp;

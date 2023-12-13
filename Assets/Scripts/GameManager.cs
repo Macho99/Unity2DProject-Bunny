@@ -9,7 +9,6 @@ using UnityEngine.Events;
 
 public class GameManager : MonoBehaviour
 {
-    public List<GameObject> monsterPrefabList;
     private static GameManager _instance;
     private Player player;
     public TextMeshProUGUI scoreText;
@@ -17,9 +16,6 @@ public class GameManager : MonoBehaviour
     private float hpImageWidth;
     private int score = 0;
     public int goal = 5;
-    public float spawnPeriod;
-    public float spawnPeriodOffset;
-    public GameObject monsterFolder;
     public static GameManager Instance
     {
         get
@@ -38,6 +34,7 @@ public class GameManager : MonoBehaviour
             return _instance;
         }
     }
+
     public Player GetPlayer()
     {
         return player;
@@ -56,7 +53,6 @@ public class GameManager : MonoBehaviour
         hpImageWidth = hpImage.transform.parent.GetComponent<Image>().rectTransform.sizeDelta.x;
         player = FindObjectOfType<Player>();
         scoreText.text = $"0 / {goal.ToString()}";
-        StartCoroutine(SpawnCoroutine());
     }
 
     void Update()
@@ -83,19 +79,4 @@ public class GameManager : MonoBehaviour
         return;
     }
 
-    void SpawnMonster()
-    {
-        GameObject monsterPrefab = monsterPrefabList[Random.Range(0, monsterPrefabList.Count)];
-        GameObject monster = Instantiate(monsterPrefab, monsterFolder.transform);
-        monster.transform.position = new Vector3(Random.Range(-3.0f, 3.0f), Random.Range(-3.0f, 3.0f));
-    }
-
-    IEnumerator SpawnCoroutine()
-    {
-        while(true)
-        {
-            yield return new WaitForSeconds(Random.Range(spawnPeriod - spawnPeriodOffset, spawnPeriod + spawnPeriodOffset));
-            SpawnMonster();
-        }
-    }
 }

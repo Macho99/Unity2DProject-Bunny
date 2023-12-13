@@ -37,6 +37,7 @@ public class Player : MonoBehaviour
     public void ThrowBomb()
     {
         Bomb bomb = Instantiate(bombPrefab, transform.position, Quaternion.identity).GetComponent<Bomb>();
+        bomb.gameObject.transform.parent = bullets.transform;
         Vector2 targetPos = Camera.main.ScreenToWorldPoint((Vector2)Input.mousePosition);
         bomb.Throw(targetPos);
     }
@@ -55,20 +56,38 @@ public class Player : MonoBehaviour
             yield return new WaitForSeconds(shotPeriod);
         }
     }
-    private void TakeDamage()
+    private void TakeDamage(int amount)
     {
         curHp--;
-        GameManager.Instance.PlayerHpChanged();
         if(curHp <= 0)
         {
             curHp = 0;
         }
+        GameManager.Instance.PlayerHpChanged();
     }
+    private void Heal(int amount)
+    {
+        curHp += amount;
+        if(curHp > maxHp)
+        {
+            curHp = maxHp;
+        }
+        GameManager.Instance.PlayerHpChanged();
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if(collision.collider.TryGetComponent<Monster>(out Monster monster))
         {
-            TakeDamage();
+            TakeDamage(1);
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(collision.TryGetComponent<Carrot>(out Carrot carrot))
+        {
+            Heal(carrot.GetHealAmount());
         }
     }
 }
