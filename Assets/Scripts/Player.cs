@@ -6,12 +6,10 @@ public class Player : MonoBehaviour
 {
     public int maxHp;
     public int curHp;
-    private GameManager gameManager;
-    public GameObject bulletPrefab;
-    public GameObject bullets;
     private Transform gunTrans;
     private Transform gunFirePoint;
     public float shotPeriod;
+    public GameObject healParticlePrefab;
 
     public GameObject bombPrefab;
 
@@ -24,11 +22,10 @@ public class Player : MonoBehaviour
         gunTrans = transform.GetChild(0).GetChild(0);
         gunFirePoint = gunTrans.GetChild(0);
         StartCoroutine(ShotCoroutine());
-        gameManager = GameManager.Instance;
     }
     public void Shot()
     {
-        GameObject bullet = Instantiate(bulletPrefab, bullets.transform);
+        GameObject bullet = ObjPoolManager.Instance.GetBullet().gameObject;
         bullet.transform.position = gunFirePoint.position;
         bullet.GetComponent<Bullet>().SetDirection((gunTrans.position - transform.position).normalized);
         bullet.transform.rotation = gunTrans.rotation;
@@ -36,10 +33,9 @@ public class Player : MonoBehaviour
 
     public void ThrowBomb()
     {
-        Bomb bomb = Instantiate(bombPrefab, transform.position, Quaternion.identity).GetComponent<Bomb>();
-        bomb.gameObject.transform.parent = bullets.transform;
+        Bomb bomb = ObjPoolManager.Instance.GetBomb();
         Vector2 targetPos = Camera.main.ScreenToWorldPoint((Vector2)Input.mousePosition);
-        bomb.Throw(targetPos);
+        bomb.Throw(transform.position ,targetPos);
     }
 
     public void ShotKeyToggle()
@@ -88,6 +84,8 @@ public class Player : MonoBehaviour
         if(collision.TryGetComponent<Carrot>(out Carrot carrot))
         {
             Heal(carrot.GetHealAmount());
+            GameObject particleObj = Instantiate(healParticlePrefab, transform);
+            Destroy(particleObj, particleObj.GetComponent<ParticleSystem>().main.duration);
         }
     }
 }

@@ -5,26 +5,30 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
     public float speed = 100;
-    private Vector3 dir;
     Rigidbody2D rb;
-    void Start()
+    private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        rb.velocity = dir * speed;
-        Destroy(gameObject, 10f);
+    }
+    void Start()
+    {
+        StartCoroutine(TimeOutDestroy());
     }
 
     public void SetDirection(Vector3 dir)
     {
-        this.dir = dir;
+        rb.velocity = dir * speed;
     }
 
-    private void Update()
+    IEnumerator TimeOutDestroy()
     {
+        yield return new WaitForSeconds(10f);
+        ObjPoolManager.Instance.ReturnBullet(this);
+        yield return null;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        Destroy(gameObject);
+        ObjPoolManager.Instance.ReturnBullet(this);
     }
 }

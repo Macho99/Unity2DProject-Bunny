@@ -5,13 +5,7 @@ using UnityEngine;
 
 public class Carrot : MonoBehaviour
 {
-    public ParticleSystem ps;
     private int healAmount = 1;
-    private void Start()
-    {
-        ps = GetComponentInChildren<ParticleSystem>();
-        ps.gameObject.SetActive(false);
-    }
     public void SetHealAmount(int amount)
     {
         healAmount = amount;
@@ -24,9 +18,7 @@ public class Carrot : MonoBehaviour
     {
         if(collision.TryGetComponent<Player>(out _))
         {
-            ps.gameObject.SetActive(true);
-            GetComponent<SpriteRenderer>().enabled = false;
-            Destroy(gameObject, 2f);
+            Destroy(gameObject);
         }
         else if(collision.TryGetComponent<Monster>(out _))
         {

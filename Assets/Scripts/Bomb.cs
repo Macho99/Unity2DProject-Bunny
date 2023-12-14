@@ -18,10 +18,9 @@ public class Bomb : MonoBehaviour
         colliderObj.GetComponent<BombCollider>().SetDamage(damage);
     }
 
-    public void Throw(Vector3 targetPos)
+    public void Throw(Vector3 startPos, Vector3 targetPos)
     {
-
-        startPos = transform.position;
+        this.startPos = startPos;
         this.targetPos = targetPos;
         
         _ = StartCoroutine(FlyingCoroutine());
@@ -42,7 +41,7 @@ public class Bomb : MonoBehaviour
 
             if(durationAmount <= 0.5)
             {
-                currentHeight = Mathf.Sin(Mathf.Lerp(0f, 90f,durationAmount * 2) * Mathf.Deg2Rad) * maxHeight;
+                currentHeight = Mathf.Sin(Mathf.Lerp(0f, 90f, durationAmount * 2) * Mathf.Deg2Rad) * maxHeight;
                 //currentHeight = Mathf.Lerp(0, maxHeight, durationAmount * 2);
                 spriteVector.y = currentHeight;
             }
@@ -61,6 +60,16 @@ public class Bomb : MonoBehaviour
         spriteTransform.gameObject.SetActive(false);
         explosionObj.SetActive(true);
         colliderObj.SetActive(true);
-        Destroy(gameObject, 0.5f);
+        StartCoroutine(TimeOutDestroy());
+    }
+
+    IEnumerator TimeOutDestroy()
+    {
+        yield return new WaitForSeconds(0.5f);
+        spriteTransform.gameObject.SetActive(true);
+        explosionObj.SetActive(false);
+        colliderObj.SetActive(false);
+        ObjPoolManager.Instance.ReturnBomb(this);
+        yield return null;
     }
 }
